@@ -1,0 +1,431 @@
+   900→   900→              <p className="text-[10px] text-blue-100">{student.tenant.name}</p>
+   901→   901→            </div>
+   902→   902→          </div>
+   903→   903→          <div className="flex items-center gap-1">
+   904→   904→            <button onClick={onRefresh} className="p-2 hover:bg-white/10 rounded-lg transition-colors active:scale-90" title="Refresh">
+   905→   905→              <RefreshCw className={`w-4 h-4 transition-transform duration-500 ${isRefreshing ? 'animate-spin' : ''}`} />
+   906→   906→            </button>
+   907→   907→            <button onClick={onLogout} className="p-2 hover:bg-white/10 rounded-lg transition-colors active:scale-90" title="Keluar">
+   908→   908→              <LogOut className="w-4 h-4" />
+   909→   909→            </button>
+   910→   910→          </div>
+   911→   911→        </div>
+   912→   912→      </header>
+   913→   913→
+   914→   914→      <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-4 pb-24">
+   915→   915→        <div key={activeTab} className="tab-content">
+   916→   916→
+   917→   917→          {/* ============ DASHBOARD ============ */}
+   918→   918→          {activeTab === 'dashboard' && (
+   919→   919→            <div className="space-y-4">
+   920→   920→              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 text-white shadow-lg animate-slide-up">
+   921→   921→                <div className="flex items-center gap-3">
+   922→   922→                  <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-xl font-bold backdrop-blur-sm">{student.name.charAt(0)}</div>
+   923→   923→                  <div className="flex-1 min-w-0">
+   924→   924→                    <h2 className="font-bold text-base truncate">{student.name}</h2>
+   925→   925→                    <p className="text-blue-100 text-xs">Kelas {student.classroom} &bull; NIS: {student.nis}</p>
+   926→   926→                    {student.nisn && <p className="text-blue-200 text-[10px]">NISN: {student.nisn}</p>}
+   927→   927→                  </div>
+   928→   928→                </div>
+   929→   929→                {student.waliKelas && (
+   930→   930→                  <div className="mt-3 pt-3 border-t border-white/20 flex items-center gap-2 text-xs text-blue-100">
+   931→   931→                    <Phone className="w-3 h-3" />Wali Kelas: {student.waliKelas.name}
+   932→   932→                  </div>
+   933→   933→                )}
+   934→   934→              </div>
+   935→   935→
+   936→   936→              <div className="grid grid-cols-2 gap-3">
+   937→   937→                <div className="bg-white rounded-xl p-3 shadow-sm border text-center card-lift animate-slide-up stagger-1">
+   938→   938→                  <DonutChart hadir={attendanceSummary.hadir} sakit={attendanceSummary.sakit} izin={attendanceSummary.izin} alpha={attendanceSummary.alpha} total={attendanceSummary.total} size={64} />
+   939→   939→                  <p className="text-[10px] text-gray-500 mt-1">Kehadiran</p>
+   940→   940→                </div>
+   941→   941→                <div className="bg-white rounded-xl p-3 shadow-sm border text-center card-lift animate-slide-up stagger-2">
+   942→   942→                  <p className="text-2xl font-bold text-blue-600 animate-count">{grades.pengetahuanAverage}</p>
+   943→   943→                  <p className="text-[10px] text-gray-500">Rata-rata Nilai</p>
+   944→   944→                  <p className={`text-[10px] ${grades.isAllTuntas ? 'text-emerald-600' : 'text-red-600'}`}>
+   945→   945→                    {grades.isAllTuntas ? 'Semua Tuntas' : `${grades.belowKKMCount} di bawah KKM`}
+   946→   946→                  </p>
+   947→   947→                </div>
+   948→   948→              </div>
+   949→   949→
+   950→   950→              <div className="grid grid-cols-3 gap-3">
+   951→   951→                <div className="bg-white rounded-xl p-3 shadow-sm border text-center cursor-pointer hover:shadow-md transition-shadow active:scale-95 animate-slide-up stagger-3" onClick={() => setActiveTab('tahfiz')}>
+   952→   952→                  <Moon className="w-5 h-5 mx-auto text-purple-500 mb-1" />
+   953→   953→                  <p className="text-lg font-bold text-purple-600 animate-count">{tahfiz.surahMemorized}</p>
+   954→   954→                  <p className="text-[10px] text-gray-500">Surah Hafalan</p>
+   955→   955→                </div>
+   956→   956→                <div className="bg-white rounded-xl p-3 shadow-sm border text-center cursor-pointer hover:shadow-md transition-shadow active:scale-95 animate-slide-up stagger-4" onClick={() => setActiveTab('kesiswaan')}>
+   957→   957→                  <Trophy className="w-5 h-5 mx-auto text-amber-500 mb-1" />
+   958→   958→                  <p className="text-lg font-bold text-amber-600 animate-count">{achievements.count}</p>
+   959→   959→                  <p className="text-[10px] text-gray-500">Prestasi</p>
+   960→   960→                </div>
+   961→   961→                <div className="bg-white rounded-xl p-3 shadow-sm border text-center cursor-pointer hover:shadow-md transition-shadow active:scale-95 animate-slide-up stagger-5" onClick={() => setActiveTab('kesiswaan')}>
+   962→   962→                  <ShieldAlert className="w-5 h-5 mx-auto text-red-500 mb-1" />
+   963→   963→                  <p className="text-lg font-bold text-red-600 animate-count">{violations.totalPoints}</p>
+   964→   964→                  <p className="text-[10px] text-gray-500">Poin Pelanggaran</p>
+   965→   965→                </div>
+   966→   966→              </div>
+   967→   967→
+   968→   968→              {scheduleByDay[todayDow] && todayDow >= 1 && todayDow <= 6 && (
+   969→   969→                <div className="bg-white rounded-xl border shadow-sm animate-slide-up stagger-5">
+   970→   970→                  <div className="px-4 py-2.5 border-b bg-blue-50 rounded-t-xl flex items-center justify-between">
+   971→   971→                    <h4 className="text-sm font-semibold text-blue-700">Jadwal Hari Ini</h4>
+   972→   972→                    <button onClick={() => setActiveTab('schedule')} className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-0.5 press-effect">
+   973→   973→                      Lihat Semua <ChevronRight className="w-3 h-3" />
+   974→   974→                    </button>
+   975→   975→                  </div>
+   976→   976→                  <div className="divide-y">
+   977→   977→                    {scheduleByDay[todayDow].slice(0, 4).map(s => (
+   978→   978→                      <div key={s.id} className="px-4 py-2.5 flex items-center gap-3 press-effect">
+   979→   979→                        <div className="text-xs text-gray-400 w-12 shrink-0">Jam {s.startPeriod}</div>
+   980→   980→                        <div className="flex-1">
+   981→   981→                          <p className="text-sm font-medium text-gray-800">{s.subject.name}</p>
+   982→   982→                          {s.teacher && <p className="text-[10px] text-gray-400">{s.teacher.name}</p>}
+   983→   983→                        </div>
+   984→   984→                      </div>
+   985→   985→                    ))}
+   986→   986→                  </div>
+   987→   987→                </div>
+   988→   988→              )}
+   989→   989→
+   990→   990→              {tahfiz.latestRecords.length > 0 && (
+   991→   991→                <div className="bg-white rounded-xl border shadow-sm animate-slide-up stagger-6">
+   992→   992→                  <div className="px-4 py-2.5 border-b bg-purple-50 rounded-t-xl flex items-center justify-between">
+   993→   993→                    <h4 className="text-sm font-semibold text-purple-700">Tahfiz Terakhir</h4>
+   994→   994→                    <button onClick={() => setActiveTab('tahfiz')} className="text-xs text-purple-500 hover:text-purple-700 flex items-center gap-0.5 press-effect">
+   995→   995→                      Detail <ChevronRight className="w-3 h-3" />
+   996→   996→                    </button>
+   997→   997→                  </div>
+   998→   998→                  <div className="px-4 py-3">
+   999→   999→                    {tahfiz.latestRecords.slice(0, 3).map(r => (
+  1000→  1000→                      <div key={r.id} className="flex items-center justify-between py-1.5">
+  1001→  1001→                        <div>
+  1002→  1002→                          <p className="text-sm text-gray-800">{r.surah} : {r.ayahStart}-{r.ayahEnd}</p>
+  1003→  1003→                          <p className="text-[10px] text-gray-400">{r.type === 'ziyadah' ? 'Ziyadah' : 'Muraja\'ah'}</p>
+  1004→  1004→                        </div>
+  1005→  1005→                        <span className={`text-sm font-bold ${r.score >= 75 ? 'text-emerald-600' : 'text-amber-600'}`}>{r.score}</span>
+  1006→  1006→                      </div>
+  1007→  1007→                    ))}
+  1008→  1008→                  </div>
+  1009→  1009→                </div>
+  1010→  1010→              )}
+  1011→  1011→
+  1012→  1012→              {announcements.filter(a => a.isPinned).slice(0, 2).map((a, i) => (
+  1013→  1013→                <div key={a.id} className="bg-blue-50 border border-blue-200 rounded-xl p-3 animate-slide-up">
+  1014→  1014→                  <div className="flex items-center gap-1.5 mb-1">
+  1015→  1015→                    <Bell className="w-3.5 h-3.5 text-blue-500" />
+  1016→  1016→                    <span className="text-xs font-semibold text-blue-700">{a.title}</span>
+  1017→  1017→                  </div>
+  1018→  1018→                  <p className="text-xs text-blue-600 line-clamp-2">{a.content}</p>
+  1019→  1019→                </div>
+  1020→  1020→              ))}
+  1021→  1021→            </div>
+  1022→  1022→          )}
+  1023→  1023→
+  1024→  1024→          {/* ============ SCHEDULE ============ */}
+  1025→  1025→          {activeTab === 'schedule' && (
+  1026→  1026→            <div className="space-y-4">
+  1027→  1027→              <h3 className="text-lg font-bold text-gray-800 animate-slide-up">Jadwal Pelajaran</h3>
+  1028→  1028→              <p className="text-xs text-gray-500 animate-slide-up stagger-1">Kelas {student.classroom} - {student.academicYear}</p>
+  1029→  1029→
+  1030→  1030→              {[1, 2, 3, 4, 5, 6].map((day, di) => {
+  1031→  1031→                const daySchedules = scheduleByDay[day];
+  1032→  1032→                if (!daySchedules || daySchedules.length === 0) return null;
+  1033→  1033→                const isToday = day === todayDow;
+  1034→  1034→                return (
+  1035→  1035→                  <div key={day} className={`bg-white rounded-xl border shadow-sm animate-slide-up stagger-${Math.min(di + 1, 6)} ${isToday ? 'ring-2 ring-blue-400' : ''}`}>
+  1036→  1036→                    <div className={`px-4 py-2.5 border-b rounded-t-xl flex items-center gap-2 ${isToday ? 'bg-blue-50' : 'bg-gray-50'}`}>
+  1037→  1037→                      <Calendar className={`w-4 h-4 ${isToday ? 'text-blue-600' : 'text-gray-400'}`} />
+  1038→  1038→                      <h4 className={`text-sm font-semibold ${isToday ? 'text-blue-700' : 'text-gray-700'}`}>
+  1039→  1039→                        {DAY_NAMES[day]}
+  1040→  1040→                        {isToday && <span className="ml-2 text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded-full animate-pulse">Hari Ini</span>}
+  1041→  1041→                      </h4>
+  1042→  1042→                    </div>
+  1043→  1043→                    <div className="divide-y">
+  1044→  1044→                      {daySchedules.map(s => (
+  1045→  1045→                        <div key={s.id} className="px-4 py-2.5 flex items-center gap-3 press-effect">
+  1046→  1046→                          <div className="text-center w-14 shrink-0">
+  1047→  1047→                            <p className="text-xs font-bold text-gray-700">Jam {s.startPeriod}</p>
+  1048→  1048→                            <p className="text-[10px] text-gray-400">{s.startPeriod === s.endPeriod ? '' : `s/d ${s.endPeriod}`}</p>
+  1049→  1049→                          </div>
+  1050→  1050→                          <div className="w-px h-8 bg-gray-200" />
+  1051→  1051→                          <div className="flex-1">
+  1052→  1052→                            <p className="text-sm font-medium text-gray-800">{s.subject.name}</p>
+  1053→  1053→                            <p className="text-[10px] text-gray-400">{s.subject.code}{s.teacher && ` \u2022 ${s.teacher.name}`}</p>
+  1054→  1054→                          </div>
+  1055→  1055→                        </div>
+  1056→  1056→                      ))}
+  1057→  1057→                    </div>
+  1058→  1058→                  </div>
+  1059→  1059→                );
+  1060→  1060→              })}
+  1061→  1061→
+  1062→  1062→              {Object.keys(scheduleByDay).length === 0 && (
+  1063→  1063→                <div className="text-center py-8 animate-fade-in">
+  1064→  1064→                  <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+  1065→  1065→                  <p className="text-gray-500 text-sm">Jadwal belum tersedia</p>
+  1066→  1066→                </div>
+  1067→  1067→              )}
+  1068→  1068→            </div>
+  1069→  1069→          )}
+  1070→  1070→
+  1071→  1071→          {/* ============ GRADES ============ */}
+  1072→  1072→          {activeTab === 'grades' && (
+  1073→  1073→            <div className="space-y-4">
+  1074→  1074→              <div className="flex items-center justify-between">
+  1075→  1075→                <h3 className="text-lg font-bold text-gray-800">Nilai</h3>
+  1076→  1076→                <div className="relative" ref={gradeDropdownRef}>
+  1077→  1077→                  <button onClick={() => setShowGradeDropdown(!showGradeDropdown)}
+  1078→  1078→                    className="flex items-center gap-1 px-3 py-1.5 bg-white border rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 active:scale-95 transition-all">
+  1079→  1079→                    {GRADE_TYPE_LABELS[gradeType] || gradeType}<ChevronDown className={`w-3 h-3 transition-transform duration-200 ${showGradeDropdown ? 'rotate-180' : ''}`} />
+  1080→  1080→                  </button>
+  1081→  1081→                  {showGradeDropdown && (
+  1082→  1082→                    <div className="absolute right-0 top-full mt-1 bg-white border rounded-lg shadow-lg z-10 py-1 min-w-[140px] animate-slide-down">
+  1083→  1083→                      {grades.availableTypes.map(t => (
+  1084→  1084→                        <button key={t.type} onClick={() => onGradeTypeChange(t.type)}
+  1085→  1085→                          className={`w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 active:bg-gray-100 transition-colors ${gradeType === t.type ? 'text-blue-600 font-medium bg-blue-50' : 'text-gray-700'}`}>
+  1086→  1086→                          {GRADE_TYPE_LABELS[t.type] || t.type} ({t.count})
+  1087→  1087→                        </button>
+  1088→  1088→                      ))}
+  1089→  1089→                    </div>
+  1090→  1090→                  )}
+  1091→  1091→                </div>
+  1092→  1092→              </div>
+  1093→  1093→              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-4 text-white animate-slide-up">
+  1094→  1094→                <p className="text-xs text-blue-100">Rata-rata Nilai {GRADE_TYPE_LABELS[gradeType] || gradeType}</p>
+  1095→  1095→                <p className="text-3xl font-bold animate-count">{grades.average}</p>
+  1096→  1096→                <p className="text-xs text-blue-200 mt-1">{grades.count} mata pelajaran</p>
+  1097→  1097→              </div>
+  1098→  1098→              <div className="space-y-2">
+  1099→  1099→                {grades.list.map((g, i) => (
+  1100→  1100→                  <div key={g.id} className={`bg-white rounded-xl p-3 shadow-sm border card-lift animate-slide-up stagger-${Math.min(i + 1, 6)}`}>
+  1101→  1101→                    <div className="flex items-center justify-between mb-1.5">
+  1102→  1102→                      <p className="text-sm font-medium text-gray-800">{g.subject.name}</p>
+  1103→  1103→                      <p className={`text-sm font-bold ${g.score >= 75 ? 'text-emerald-600' : 'text-red-600'}`}>{g.score}</p>
+  1104→  1104→                    </div>
+  1105→  1105→                    <div className="w-full bg-gray-100 rounded-full h-2">
+  1106→  1106→                      <div className={`h-2 rounded-full progress-fill ${g.score >= 75 ? 'bg-emerald-500' : 'bg-red-400'}`}
+  1107→  1107→                        style={{ width: `${Math.min(g.score, 100)}%` }} />
+  1108→  1108→                    </div>
+  1109→  1109→                    <p className="text-[10px] text-gray-400 mt-1">{g.subject.code} &bull; KKM: 75</p>
+  1110→  1110→                  </div>
+  1111→  1111→                ))}
+  1112→  1112→              </div>
+  1113→  1113→            </div>
+  1114→  1114→          )}
+  1115→  1115→
+  1116→  1116→          {/* ============ TAHFIZ ============ */}
+  1117→  1117→          {activeTab === 'tahfiz' && (
+  1118→  1118→            <div className="space-y-4">
+  1119→  1119→              <h3 className="text-lg font-bold text-gray-800">Monitoring Tahfiz</h3>
+  1120→  1120→
+  1121→  1121→              <div className="grid grid-cols-2 gap-3">
+  1122→  1122→                <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl p-4 text-white card-lift animate-scale-in stagger-1">
+  1123→  1123→                  <Moon className="w-6 h-6 mb-1 opacity-80" />
+  1124→  1124→                  <p className="text-2xl font-bold animate-count">{tahfiz.surahMemorized}</p>
+  1125→  1125→                  <p className="text-xs text-purple-100">Surah Dihafal</p>
+  1126→  1126→                </div>
+  1127→  1127→                <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-4 text-white card-lift animate-scale-in stagger-2">
+  1128→  1128→                  <Star className="w-6 h-6 mb-1 opacity-80" />
+  1129→  1129→                  <p className="text-2xl font-bold animate-count">{tahfiz.averageScore}</p>
+  1130→  1130→                  <p className="text-xs text-emerald-100">Rata-rata Nilai</p>
+  1131→  1131→                </div>
+  1132→  1132→              </div>
+  1133→  1133→
+  1134→  1134→              <div className="grid grid-cols-2 gap-3">
+  1135→  1135→                <div className="bg-white rounded-xl p-3 shadow-sm border text-center card-lift animate-scale-in stagger-3">
+  1136→  1136→                  <p className="text-lg font-bold text-blue-600 animate-count">{tahfiz.ziyadahCount}</p>
+  1137→  1137→                  <p className="text-[10px] text-gray-500">Sesi Ziyadah</p>
+  1138→  1138→                </div>
+  1139→  1139→                <div className="bg-white rounded-xl p-3 shadow-sm border text-center card-lift animate-scale-in stagger-4">
+  1140→  1140→                  <p className="text-lg font-bold text-green-600 animate-count">{tahfiz.murajaahCount}</p>
+  1141→  1141→                  <p className="text-[10px] text-gray-500">Sesi Muraja&apos;ah</p>
+  1142→  1142→                </div>
+  1143→  1143→              </div>
+  1144→  1144→
+  1145→  1145→              <div className="bg-white rounded-xl border shadow-sm">
+  1146→  1146→                <div className="px-4 py-2.5 border-b bg-purple-50 rounded-t-xl">
+  1147→  1147→                  <h4 className="text-sm font-semibold text-purple-700">Riwayat Hafalan</h4>
+  1148→  1148→                </div>
+  1149→  1149→                {tahfiz.latestRecords.length > 0 ? (
+  1150→  1150→                  <div className="divide-y">
+  1151→  1151→                    {tahfiz.latestRecords.map((r, i) => (
+  1152→  1152→                      <div key={r.id} className={`px-4 py-3 animate-slide-right stagger-${Math.min(i + 1, 6)}`}>
+  1153→  1153→                        <div className="flex items-center justify-between mb-1">
+  1154→  1154→                          <div className="flex items-center gap-2">
+  1155→  1155→                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${r.type === 'ziyadah' ? 'bg-blue-50 text-blue-600' : 'bg-green-50 text-green-600'}`}>
+  1156→  1156→                              {r.type === 'ziyadah' ? 'Ziyadah' : 'Muraja\'ah'}
+  1157→  1157→                            </span>
+  1158→  1158→                            <span className="text-sm font-medium text-gray-800">{r.surah}</span>
+  1159→  1159→                          </div>
+  1160→  1160→                          <span className={`text-sm font-bold ${r.score >= 75 ? 'text-emerald-600' : 'text-amber-600'}`}>{r.score}</span>
+  1161→  1161→                        </div>
+  1162→  1162→                        <div className="flex items-center justify-between">
+  1163→  1163→                          <p className="text-[10px] text-gray-400">
+  1164→  1164→                            Ayat {r.ayahStart}-{r.ayahEnd}
+  1165→  1165→                            {r.fluency && ` \u2022 ${r.fluency === 'lancar' ? 'Lancar' : r.fluency === 'cukup' ? 'Cukup' : 'Kurang'}`}
+  1166→  1166→                          </p>
+  1167→  1167→                          <p className="text-[10px] text-gray-400">{new Date(r.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</p>
+  1168→  1168→                        </div>
+  1169→  1169→                        {r.note && <p className="text-[10px] text-gray-400 mt-0.5">{r.note}</p>}
+  1170→  1170→                      </div>
+  1171→  1171→                    ))}
+  1172→  1172→                  </div>
+  1173→  1173→                ) : (
+  1174→  1174→                  <div className="py-6 text-center animate-fade-in">
+  1175→  1175→                    <Moon className="w-8 h-8 text-gray-300 mx-auto mb-1" />
+  1176→  1176→                    <p className="text-xs text-gray-500">Belum ada data tahfiz</p>
+  1177→  1177→                  </div>
+  1178→  1178→                )}
+  1179→  1179→              </div>
+  1180→  1180→            </div>
+  1181→  1181→          )}
+  1182→  1182→
+  1183→  1183→          {/* ============ KESISWAAN ============ */}
+  1184→  1184→          {activeTab === 'kesiswaan' && (
+  1185→  1185→            <div className="space-y-4">
+  1186→  1186→              <h3 className="text-lg font-bold text-gray-800">Kesiswaan</h3>
+  1187→  1187→
+  1188→  1188→              <div className="bg-white rounded-xl border shadow-sm animate-slide-up">
+  1189→  1189→                <div className="px-4 py-2.5 border-b bg-red-50 rounded-t-xl flex items-center justify-between">
+  1190→  1190→                  <div className="flex items-center gap-2">
+  1191→  1191→                    <ShieldAlert className="w-4 h-4 text-red-500" />
+  1192→  1192→                    <h4 className="text-sm font-semibold text-red-700">Pelanggaran</h4>
+  1193→  1193→                  </div>
+  1194→  1194→                  <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded-full">{violations.totalPoints} poin</span>
+  1195→  1195→                </div>
+  1196→  1196→                {violations.list.length > 0 ? (
+  1197→  1197→                  <div className="divide-y">
+  1198→  1198→                    {violations.list.map((v, i) => {
+  1199→  1199→                      const catCfg = VIOLATION_CATEGORY[v.category] || VIOLATION_CATEGORY.ringan;
+  1200→  1200→                      return (
+  1201→  1201→                        <div key={v.id} className={`px-4 py-3 animate-slide-right stagger-${Math.min(i + 1, 6)}`}>
+  1202→  1202→                          <div className="flex items-center justify-between mb-1">
+  1203→  1203→                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${catCfg.color}`}>{catCfg.label}</span>
+  1204→  1204→                            <span className="text-xs text-gray-400">{new Date(v.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+  1205→  1205→                          </div>
+  1206→  1206→                          <p className="text-sm text-gray-800">{v.description}</p>
+  1207→  1207→                          <div className="flex items-center justify-between mt-1">
+  1208→  1208→                            <p className="text-[10px] text-red-500 font-medium">-{v.points} poin</p>
+  1209→  1209→                            {v.action && <p className="text-[10px] text-gray-400">Tindakan: {v.action}</p>}
+  1210→  1210→                          </div>
+  1211→  1211→                        </div>
+  1212→  1212→                      );
+  1213→  1213→                    })}
+  1214→  1214→                  </div>
+  1215→  1215→                ) : (
+  1216→  1216→                  <div className="py-6 text-center animate-fade-in">
+  1217→  1217→                    <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-1" />
+  1218→  1218→                    <p className="text-xs text-gray-500">Tidak ada catatan pelanggaran</p>
+  1219→  1219→                  </div>
+  1220→  1220→                )}
+  1221→  1221→              </div>
+  1222→  1222→
+  1223→  1223→              <div className="bg-white rounded-xl border shadow-sm animate-slide-up stagger-2">
+  1224→  1224→                <div className="px-4 py-2.5 border-b bg-amber-50 rounded-t-xl flex items-center justify-between">
+  1225→  1225→                  <div className="flex items-center gap-2">
+  1226→  1226→                    <Trophy className="w-4 h-4 text-amber-500" />
+  1227→  1227→                    <h4 className="text-sm font-semibold text-amber-700">Prestasi</h4>
+  1228→  1228→                  </div>
+  1229→  1229→                  <span className="text-xs font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">{achievements.count} prestasi</span>
+  1230→  1230→                </div>
+  1231→  1231→                {achievements.list.length > 0 ? (
+  1232→  1232→                  <div className="divide-y">
+  1233→  1233→                    {achievements.list.map((a, i) => {
+  1234→  1234→                      const catCfg = ACHIEVEMENT_CATEGORY[a.category] || ACHIEVEMENT_CATEGORY.akademik;
+  1235→  1235→                      return (
+  1236→  1236→                        <div key={a.id} className={`px-4 py-3 animate-slide-right stagger-${Math.min(i + 1, 6)}`}>
+  1237→  1237→                          <div className="flex items-center justify-between mb-1">
+  1238→  1238→                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${catCfg.color}`}>{catCfg.label}</span>
+  1239→  1239→                            <span className="text-xs text-gray-400">{new Date(a.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+  1240→  1240→                          </div>
+  1241→  1241→                          <p className="text-sm font-medium text-gray-800">{a.title}</p>
+  1242→  1242→                          <div className="flex items-center gap-2 mt-1">
+  1243→  1243→                            <span className="text-[10px] text-gray-400">{LEVEL_LABELS[a.level] || a.level}</span>
+  1244→  1244→                            {a.ranking && <span className="text-[10px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">{a.ranking}</span>}
+  1245→  1245→                          </div>
+  1246→  1246→                          {a.description && <p className="text-[10px] text-gray-400 mt-0.5">{a.description}</p>}
+  1247→  1247→                        </div>
+  1248→  1248→                      );
+  1249→  1249→                    })}
+  1250→  1250→                  </div>
+  1251→  1251→                ) : (
+  1252→  1252→                  <div className="py-6 text-center animate-fade-in">
+  1253→  1253→                    <Trophy className="w-8 h-8 text-gray-300 mx-auto mb-1" />
+  1254→  1254→                    <p className="text-xs text-gray-500">Belum ada catatan prestasi</p>
+  1255→  1255→                  </div>
+  1256→  1256→                )}
+  1257→  1257→              </div>
+  1258→  1258→
+  1259→  1259→              <div className="bg-white rounded-xl border shadow-sm animate-slide-up stagger-4">
+  1260→  1260→                <div className="px-4 py-2.5 border-b bg-gray-50 rounded-t-xl">
+  1261→  1261→                  <h4 className="text-sm font-semibold text-gray-700">Presensi - {attendanceSummary.periodLabel}</h4>
+  1262→  1262→                </div>
+  1263→  1263→                <div className="grid grid-cols-4 gap-2 p-4">
+  1264→  1264→                  {Object.entries(STATUS_CONFIG).map(([key, cfg], i) => {
+  1265→  1265→                    const val = attendanceSummary[key.toLowerCase() as keyof AttendanceSummary] as number;
+  1266→  1266→                    const Icon = cfg.icon;
+  1267→  1267→                    return (
+  1268→  1268→                      <div key={key} className={`rounded-lg p-2 text-center animate-scale-in stagger-${i + 1} ${cfg.color}`}>
+  1269→  1269→                        <Icon className="w-4 h-4 mx-auto mb-0.5" />
+  1270→  1270→                        <p className="text-sm font-bold">{val}</p>
+  1271→  1271→                        <p className="text-[8px]">{cfg.label}</p>
+  1272→  1272→                      </div>
+  1273→  1273→                    );
+  1274→  1274→                  })}
+  1275→  1275→                </div>
+  1276→  1276→              </div>
+  1277→  1277→            </div>
+  1278→  1278→          )}
+  1279→  1279→
+  1280→  1280→          {/* ============ ANNOUNCEMENTS ============ */}
+  1281→  1281→          {activeTab === 'announcements' && (
+  1282→  1282→            <div className="space-y-3">
+  1283→  1283→              <h3 className="text-lg font-bold text-gray-800">Pengumuman</h3>
+  1284→  1284→              {announcements.map((a, i) => {
+  1285→  1285→                const catCfg = CATEGORY_LABELS[a.category] || CATEGORY_LABELS.umum;
+  1286→  1286→                return (
+  1287→  1287→                  <div key={a.id} className={`bg-white rounded-xl p-4 shadow-sm border card-lift animate-slide-up stagger-${Math.min(i + 1, 6)}`}>
+  1288→  1288→                    <div className="flex items-center gap-2 mb-2">
+  1289→  1289→                      {a.isPinned && <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />}
+  1290→  1290→                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${catCfg.color}`}>{catCfg.label}</span>
+  1291→  1291→                    </div>
+  1292→  1292→                    <h4 className="text-sm font-semibold text-gray-800">{a.title}</h4>
+  1293→  1293→                    <p className="text-xs text-gray-600 mt-1 line-clamp-3">{a.content}</p>
+  1294→  1294→                    <p className="text-[10px] text-gray-400 mt-2">{a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : ''}</p>
+  1295→  1295→                  </div>
+  1296→  1296→                );
+  1297→  1297→              })}
+  1298→  1298→              {announcements.length === 0 && (
+  1299→  1299→                <div className="text-center py-8 animate-fade-in">
+  1300→  1300→                  <Bell className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+  1301→  1301→                  <p className="text-gray-500 text-sm">Belum ada pengumuman</p>
+  1302→  1302→                </div>
+  1303→  1303→              )}
+  1304→  1304→            </div>
+  1305→  1305→          )}
+  1306→  1306→        </div>
+  1307→  1307→      </main>
+  1308→  1308→
+  1309→  1309→      {/* Bottom Navigation */}
+  1310→  1310→      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
+  1311→  1311→        <div className="max-w-2xl mx-auto flex">
+  1312→  1312→          {studentTabs.map(tab => {
+  1313→  1313→            const Icon = tab.icon;
+  1314→  1314→            const isActive = activeTab === tab.key;
+  1315→  1315→            return (
+  1316→  1316→              <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+  1317→  1317→                className={`flex-1 py-2.5 flex flex-col items-center gap-0.5 transition-all duration-200 press-effect nav-indicator ${isActive ? 'active text-blue-600' : 'text-gray-400'}`}>
+  1318→  1318→                <Icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? 'scale-110' : ''}`} />
+  1319→  1319→                <span className={`text-[10px] font-medium transition-all duration-200 ${isActive ? 'text-blue-600' : ''}`}>{tab.label}</span>
+  1320→  1320→              </button>
+  1321→  1321→            );
+  1322→  1322→          })}
+  1323→  1323→        </div>
+  1324→  1324→      </nav>
+  1325→  1325→
+  1326→  1326→      {showLogoutConfirm && <LogoutModal onConfirm={onConfirmLogout} onCancel={() => setShowLogoutConfirm(false)} />}
+  1327→  1327→    </div>
+  1328→  1328→  );
+  1329→  1329→}
+  1330→  1330→

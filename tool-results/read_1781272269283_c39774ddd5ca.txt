@@ -1,0 +1,502 @@
+   501→   501→                      <input
+   502→   502→                        type="password"
+   503→   503→                        value={studentPassword}
+   504→   504→                        onChange={(e) => { setStudentPassword(e.target.value); setLoginError(''); }}
+   505→   505→                        onKeyDown={(e) => e.key === 'Enter' && handleStudentLogin()}
+   506→   506→                        placeholder="Masukkan password"
+   507→   507→                        className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm outline-none transition-all"
+   508→   508→                      />
+   509→   509→                    </div>
+   510→   510→                  </div>
+   511→   511→                  {loginError && (
+   512→   512→                    <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+   513→   513→                      <AlertCircle className="w-4 h-4 shrink-0" />{loginError}
+   514→   514→                    </div>
+   515→   515→                  )}
+   516→   516→                  <button
+   517→   517→                    onClick={handleStudentLogin}
+   518→   518→                    disabled={isLoading}
+   519→   519→                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2.5 rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-md shadow-blue-200"
+   520→   520→                  >
+   521→   521→                    {isLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><LogIn className="w-4 h-4" />Masuk</>}
+   522→   522→                  </button>
+   523→   523→                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl">
+   524→   524→                    <p className="text-xs text-blue-700">
+   525→   525→                      <strong>Demo:</strong> NIS <code className="bg-blue-100 px-1 py-0.5 rounded">20250001</code> s/d <code className="bg-blue-100 px-1 py-0.5 rounded">20250010</code>, Password: <code className="bg-blue-100 px-1 py-0.5 rounded">siswa123</code>
+   526→   526→                    </p>
+   527→   527→                  </div>
+   528→   528→                </div>
+   529→   529→              )}
+   530→   530→            </div>
+   531→   531→
+   532→   532→            <p className="text-center text-xs text-gray-400 mt-6">
+   533→   533→              SIMT MTs v1.0 &copy; 2026 &mdash; Madrasah Tsanawiyah
+   534→   534→            </p>
+   535→   535→          </div>
+   536→   536→        </main>
+   537→   537→      </div>
+   538→   538→    );
+   539→   539→  }
+   540→   540→
+   541→   541→  // ============================================================
+   542→   542→  // LOADING
+   543→   543→  // ============================================================
+   544→   544→  if (isLoading && !parentDashboard && !studentDashboard) {
+   545→   545→    return (
+   546→   546→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+   547→   547→        <div className="text-center">
+   548→   548→          <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mx-auto mb-4" />
+   549→   549→          <p className="text-gray-500">Memuat data portal...</p>
+   550→   550→        </div>
+   551→   551→      </div>
+   552→   552→    );
+   553→   553→  }
+   554→   554→
+   555→   555→  // ============================================================
+   556→   556→  // PARENT PORTAL
+   557→   557→  // ============================================================
+   558→   558→  if (portalMode === 'parent' && parentDashboard) {
+   559→   559→    return <ParentPortal
+   560→   560→      dashboard={parentDashboard}
+   561→   561→      students={parentStudents}
+   562→   562→      selectedStudentId={selectedStudentId!}
+   563→   563→      activeTab={parentTab}
+   564→   564→      setActiveTab={setParentTab}
+   565→   565→      gradeType={gradeType}
+   566→   566→      setGradeType={setGradeType}
+   567→   567→      showGradeDropdown={showGradeDropdown}
+   568→   568→      setShowGradeDropdown={setShowGradeDropdown}
+   569→   569→      isRefreshing={isRefreshing}
+   570→   570→      onGradeTypeChange={handleGradeTypeChange}
+   571→   571→      onStudentSwitch={(id) => { setSelectedStudentId(id); setParentTab('dashboard'); }}
+   572→   572→      onLogout={handleLogout}
+   573→   573→      onRefresh={() => selectedStudentId && fetchParentDashboard(selectedStudentId)}
+   574→   574→      showLogoutConfirm={showLogoutConfirm}
+   575→   575→      setShowLogoutConfirm={setShowLogoutConfirm}
+   576→   576→    />;
+   577→   577→  }
+   578→   578→
+   579→   579→  // ============================================================
+   580→   580→  // STUDENT PORTAL
+   581→   581→  // ============================================================
+   582→   582→  if (portalMode === 'student' && studentDashboard) {
+   583→   583→    return <StudentPortal
+   584→   584→      dashboard={studentDashboard}
+   585→   585→      activeTab={studentTab}
+   586→   586→      setActiveTab={setStudentTab}
+   587→   587→      gradeType={gradeType}
+   588→   588→      setGradeType={setGradeType}
+   589→   589→      showGradeDropdown={showGradeDropdown}
+   590→   590→      setShowGradeDropdown={setShowGradeDropdown}
+   591→   591→      isRefreshing={isRefreshing}
+   592→   592→      onGradeTypeChange={handleGradeTypeChange}
+   593→   593→      onLogout={handleLogout}
+   594→   594→      onRefresh={() => selectedStudentId && fetchStudentDashboard(selectedStudentId)}
+   595→   595→      showLogoutConfirm={showLogoutConfirm}
+   596→   596→      setShowLogoutConfirm={setShowLogoutConfirm}
+   597→   597→    />;
+   598→   598→  }
+   599→   599→
+   600→   600→  // Error state
+   601→   601→  return (
+   602→   602→    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+   603→   603→      <div className="text-center max-w-sm">
+   604→   604→        <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-3" />
+   605→   605→        <p className="font-semibold text-gray-800">Gagal memuat data</p>
+   606→   606→        <button onClick={handleLogout} className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm">Kembali ke Login</button>
+   607→   607→      </div>
+   608→   608→    </div>
+   609→   609→  );
+   610→   610→}
+   611→   611→
+   612→   612→// ============================================================
+   613→   613→// PARENT PORTAL COMPONENT
+   614→   614→// ============================================================
+   615→   615→function ParentPortal({ dashboard, students, selectedStudentId, activeTab, setActiveTab,
+   616→   616→  gradeType, setGradeType, showGradeDropdown, setShowGradeDropdown, isRefreshing,
+   617→   617→  onGradeTypeChange, onStudentSwitch, onLogout, onRefresh, showLogoutConfirm, setShowLogoutConfirm
+   618→   618→}: {
+   619→   619→  dashboard: ParentDashboardData;
+   620→   620→  students: StudentInfo[];
+   621→   621→  selectedStudentId: string;
+   622→   622→  activeTab: ParentTabKey;
+   623→   623→  setActiveTab: (t: ParentTabKey) => void;
+   624→   624→  gradeType: string;
+   625→   625→  setGradeType: (t: string) => void;
+   626→   626→  showGradeDropdown: boolean;
+   627→   627→  setShowGradeDropdown: (v: boolean) => void;
+   628→   628→  isRefreshing: boolean;
+   629→   629→  onGradeTypeChange: (t: string) => void;
+   630→   630→  onStudentSwitch: (id: string) => void;
+   631→   631→  onLogout: () => void;
+   632→   632→  onRefresh: () => void;
+   633→   633→  showLogoutConfirm: boolean;
+   634→   634→  setShowLogoutConfirm: (v: boolean) => void;
+   635→   635→}) {
+   636→   636→  const { student, attendanceSummary, payments, grades, announcements } = dashboard;
+   637→   637→  const attendancePercent = attendanceSummary.total > 0 ? Math.round((attendanceSummary.hadir / attendanceSummary.total) * 100) : 0;
+   638→   638→
+   639→   639→  const parentTabs: { key: ParentTabKey; label: string; icon: typeof BookOpen }[] = [
+   640→   640→    { key: 'dashboard', label: 'Beranda', icon: BookOpen },
+   641→   641→    { key: 'attendance', label: 'Presensi', icon: ClipboardCheck },
+   642→   642→    { key: 'grades', label: 'Nilai', icon: Star },
+   643→   643→    { key: 'payments', label: 'SPP', icon: CreditCard },
+   644→   644→    { key: 'announcements', label: 'Info', icon: Bell },
+   645→   645→  ];
+   646→   646→
+   647→   647→  return (
+   648→   648→    <div className="min-h-screen bg-gray-50 flex flex-col">
+   649→   649→      <header className="bg-gradient-to-r from-emerald-700 to-teal-700 text-white px-4 py-3 shadow-lg sticky top-0 z-50">
+   650→   650→        <div className="max-w-2xl mx-auto flex items-center justify-between">
+   651→   651→          <div className="flex items-center gap-3">
+   652→   652→            <div className="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center">
+   653→   653→              <GraduationCap className="w-5 h-5" />
+   654→   654→            </div>
+   655→   655→            <div>
+   656→   656→              <h1 className="text-sm font-bold leading-tight">Portal Orang Tua</h1>
+   657→   657→              <p className="text-[10px] text-emerald-100">{student.tenant.name}</p>
+   658→   658→            </div>
+   659→   659→          </div>
+   660→   660→          <div className="flex items-center gap-2">
+   661→   661→            <button onClick={onRefresh} className="p-2 hover:bg-white/10 rounded-lg transition-colors" title="Refresh">
+   662→   662→              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+   663→   663→            </button>
+   664→   664→            <button onClick={() => setShowLogoutConfirm(true)} className="p-2 hover:bg-white/10 rounded-lg transition-colors" title="Keluar">
+   665→   665→              <LogOut className="w-4 h-4" />
+   666→   666→            </button>
+   667→   667→          </div>
+   668→   668→        </div>
+   669→   669→      </header>
+   670→   670→
+   671→   671→      {/* Student Selector */}
+   672→   672→      {students.length > 1 && (
+   673→   673→        <div className="bg-white border-b px-4 py-2">
+   674→   674→          <div className="max-w-2xl mx-auto flex gap-2 overflow-x-auto">
+   675→   675→            {students.map(s => (
+   676→   676→              <button key={s.id} onClick={() => onStudentSwitch(s.id)}
+   677→   677→                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+   678→   678→                  s.id === selectedStudentId ? 'bg-emerald-100 text-emerald-700 border border-emerald-300' : 'bg-gray-100 text-gray-600 border border-transparent hover:bg-gray-200'
+   679→   679→                }`}>
+   680→   680→                {s.name.split(' ').slice(0, 2).join(' ')} ({s.classroom})
+   681→   681→              </button>
+   682→   682→            ))}
+   683→   683→          </div>
+   684→   684→        </div>
+   685→   685→      )}
+   686→   686→
+   687→   687→      <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-4 pb-24">
+   688→   688→        {activeTab === 'dashboard' && (
+   689→   689→          <div className="space-y-4">
+   690→   690→            {/* Student Card */}
+   691→   691→            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-4 text-white shadow-lg">
+   692→   692→              <div className="flex items-center gap-3">
+   693→   693→                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-lg font-bold">
+   694→   694→                  {student.name.charAt(0)}
+   695→   695→                </div>
+   696→   696→                <div className="flex-1 min-w-0">
+   697→   697→                  <h2 className="font-bold text-base truncate">{student.name}</h2>
+   698→   698→                  <p className="text-emerald-100 text-xs">Kelas {student.classroom} &bull; NIS: {student.nis}</p>
+   699→   699→                </div>
+   700→   700→              </div>
+   701→   701→              {student.waliKelas && (
+   702→   702→                <div className="mt-3 pt-3 border-t border-white/20 flex items-center gap-2 text-xs text-emerald-100">
+   703→   703→                  <Phone className="w-3 h-3" />
+   704→   704→                  Wali Kelas: {student.waliKelas.name}
+   705→   705→                </div>
+   706→   706→              )}
+   707→   707→            </div>
+   708→   708→
+   709→   709→            {/* Quick Stats */}
+   710→   710→            <div className="grid grid-cols-3 gap-3">
+   711→   711→              <div className="bg-white rounded-xl p-3 shadow-sm border text-center">
+   712→   712→                <DonutChart hadir={attendanceSummary.hadir} sakit={attendanceSummary.sakit} izin={attendanceSummary.izin} alpha={attendanceSummary.alpha} total={attendanceSummary.total} size={64} />
+   713→   713→                <p className="text-[10px] text-gray-500 mt-1">Kehadiran</p>
+   714→   714→              </div>
+   715→   715→              <div className="bg-white rounded-xl p-3 shadow-sm border text-center">
+   716→   716→                <p className="text-2xl font-bold text-blue-600">{grades.pengetahuanAverage}</p>
+   717→   717→                <p className="text-[10px] text-gray-500">Rata-rata Nilai</p>
+   718→   718→                <p className={`text-[10px] ${grades.isAllTuntas ? 'text-emerald-600' : 'text-red-600'}`}>
+   719→   719→                  {grades.isAllTuntas ? 'Tuntas' : `${grades.belowKKMCount} di bawah KKM`}
+   720→   720→                </p>
+   721→   721→              </div>
+   722→   722→              <div className="bg-white rounded-xl p-3 shadow-sm border text-center">
+   723→   723→                <p className="text-2xl font-bold text-red-600">{payments.unpaid.length}</p>
+   724→   724→                <p className="text-[10px] text-gray-500">SPP Belum Bayar</p>
+   725→   725→                <p className="text-[10px] text-red-500">Rp {(payments.totalUnpaid / 1000).toFixed(0)}K</p>
+   726→   726→              </div>
+   727→   727→            </div>
+   728→   728→
+   729→   729→            {/* Unpaid Alert */}
+   730→   730→            {payments.unpaid.length > 0 && (
+   731→   731→              <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-start gap-2">
+   732→   732→                <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+   733→   733→                <div>
+   734→   734→                  <p className="text-sm font-medium text-red-800">SPP Belum Dibayar</p>
+   735→   735→                  <p className="text-xs text-red-600">
+   736→   736→                    {payments.unpaid.map(p => `${MONTH_NAMES[p.month]} ${p.year}`).join(', ')}
+   737→   737→                  </p>
+   738→   738→                </div>
+   739→   739→              </div>
+   740→   740→            )}
+   741→   741→
+   742→   742→            {/* Announcements */}
+   743→   743→            {announcements.filter(a => a.isPinned).slice(0, 2).map(a => (
+   744→   744→              <div key={a.id} className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+   745→   745→                <div className="flex items-center gap-1.5 mb-1">
+   746→   746→                  <Bell className="w-3.5 h-3.5 text-blue-500" />
+   747→   747→                  <span className="text-xs font-semibold text-blue-700">{a.title}</span>
+   748→   748→                </div>
+   749→   749→                <p className="text-xs text-blue-600 line-clamp-2">{a.content}</p>
+   750→   750→              </div>
+   751→   751→            ))}
+   752→   752→          </div>
+   753→   753→        )}
+   754→   754→
+   755→   755→        {activeTab === 'attendance' && (
+   756→   756→          <div className="space-y-4">
+   757→   757→            <h3 className="text-lg font-bold text-gray-800">Presensi - {attendanceSummary.periodLabel}</h3>
+   758→   758→            <div className="grid grid-cols-4 gap-2">
+   759→   759→              {Object.entries(STATUS_CONFIG).map(([key, cfg]) => {
+   760→   760→                const val = attendanceSummary[key.toLowerCase() as keyof AttendanceSummary] as number;
+   761→   761→                const Icon = cfg.icon;
+   762→   762→                return (
+   763→   763→                  <div key={key} className={`rounded-xl p-3 text-center ${cfg.color}`}>
+   764→   764→                    <Icon className="w-5 h-5 mx-auto mb-1" />
+   765→   765→                    <p className="text-xl font-bold">{val}</p>
+   766→   766→                    <p className="text-[10px] font-medium">{cfg.label}</p>
+   767→   767→                  </div>
+   768→   768→                );
+   769→   769→              })}
+   770→   770→            </div>
+   771→   771→            <div className="bg-white rounded-xl border shadow-sm">
+   772→   772→              <div className="px-4 py-2.5 border-b bg-gray-50 rounded-t-xl">
+   773→   773→                <h4 className="text-sm font-semibold text-gray-700">Riwayat Kehadiran</h4>
+   774→   774→              </div>
+   775→   775→              <div className="divide-y">
+   776→   776→                {attendanceSummary.recent.map((a, i) => {
+   777→   777→                  const cfg = STATUS_CONFIG[a.status] || STATUS_CONFIG.HADIR;
+   778→   778→                  const Icon = cfg.icon;
+   779→   779→                  return (
+   780→   780→                    <div key={i} className="px-4 py-3 flex items-center gap-3">
+   781→   781→                      <div className="text-center w-12">
+   782→   782→                        <p className="text-xs text-gray-400">{new Date(a.date).toLocaleDateString('id-ID', { weekday: 'short' })}</p>
+   783→   783→                        <p className="text-sm font-bold">{new Date(a.date).getDate()}</p>
+   784→   784→                      </div>
+   785→   785→                      <div className={`px-2 py-1 rounded-md text-[10px] font-medium flex items-center gap-1 ${cfg.color}`}>
+   786→   786→                        <Icon className="w-3 h-3" />{cfg.label}
+   787→   787→                      </div>
+   788→   788→                      <div className="flex-1 text-xs text-gray-500">
+   789→   789→                        {a.timeIn ? `Masuk: ${new Date(a.timeIn).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}` : ''}
+   790→   790→                        {a.note && <span className="text-gray-400 ml-2">({a.note})</span>}
+   791→   791→                      </div>
+   792→   792→                    </div>
+   793→   793→                  );
+   794→   794→                })}
+   795→   795→              </div>
+   796→   796→            </div>
+   797→   797→          </div>
+   798→   798→        )}
+   799→   799→
+   800→   800→        {activeTab === 'grades' && (
+   801→   801→          <div className="space-y-4">
+   802→   802→            <div className="flex items-center justify-between">
+   803→   803→              <h3 className="text-lg font-bold text-gray-800">Nilai</h3>
+   804→   804→              <div className="relative">
+   805→   805→                <button onClick={() => setShowGradeDropdown(!showGradeDropdown)}
+   806→   806→                  className="flex items-center gap-1 px-3 py-1.5 bg-white border rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50">
+   807→   807→                  {GRADE_TYPE_LABELS[gradeType] || gradeType}<ChevronDown className="w-3 h-3" />
+   808→   808→                </button>
+   809→   809→                {showGradeDropdown && (
+   810→   810→                  <div className="absolute right-0 top-full mt-1 bg-white border rounded-lg shadow-lg z-10 py-1 min-w-[140px]">
+   811→   811→                    {grades.availableTypes.map(t => (
+   812→   812→                      <button key={t.type} onClick={() => onGradeTypeChange(t.type)}
+   813→   813→                        className={`w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 ${gradeType === t.type ? 'text-emerald-600 font-medium' : 'text-gray-700'}`}>
+   814→   814→                        {GRADE_TYPE_LABELS[t.type] || t.type} ({t.count})
+   815→   815→                      </button>
+   816→   816→                    ))}
+   817→   817→                  </div>
+   818→   818→                )}
+   819→   819→              </div>
+   820→   820→            </div>
+   821→   821→            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-4 text-white">
+   822→   822→              <p className="text-xs text-blue-100">Rata-rata Nilai {GRADE_TYPE_LABELS[gradeType] || gradeType}</p>
+   823→   823→              <p className="text-3xl font-bold">{grades.average}</p>
+   824→   824→              <p className="text-xs text-blue-200 mt-1">{grades.count} mata pelajaran</p>
+   825→   825→            </div>
+   826→   826→            <div className="space-y-2">
+   827→   827→              {grades.list.map(g => (
+   828→   828→                <div key={g.id} className="bg-white rounded-xl p-3 shadow-sm border">
+   829→   829→                  <div className="flex items-center justify-between mb-1.5">
+   830→   830→                    <p className="text-sm font-medium text-gray-800">{g.subject.name}</p>
+   831→   831→                    <p className={`text-sm font-bold ${g.score >= 75 ? 'text-emerald-600' : 'text-red-600'}`}>{g.score}</p>
+   832→   832→                  </div>
+   833→   833→                  <div className="w-full bg-gray-100 rounded-full h-2">
+   834→   834→                    <div className={`h-2 rounded-full transition-all ${g.score >= 75 ? 'bg-emerald-500' : 'bg-red-400'}`}
+   835→   835→                      style={{ width: `${Math.min(g.score, 100)}%` }} />
+   836→   836→                  </div>
+   837→   837→                  <p className="text-[10px] text-gray-400 mt-1">{g.subject.code} &bull; KKM: 75</p>
+   838→   838→                </div>
+   839→   839→              ))}
+   840→   840→            </div>
+   841→   841→          </div>
+   842→   842→        )}
+   843→   843→
+   844→   844→        {activeTab === 'payments' && (
+   845→   845→          <div className="space-y-4">
+   846→   846→            <h3 className="text-lg font-bold text-gray-800">Pembayaran SPP</h3>
+   847→   847→            {payments.unpaid.length > 0 && (
+   848→   848→              <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-2">
+   849→   849→                <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+   850→   850→                <div>
+   851→   851→                  <p className="text-sm font-medium text-red-800">{payments.unpaid.length} bulan belum dibayar</p>
+   852→   852→                  <p className="text-xs text-red-600">Total: Rp {payments.totalUnpaid.toLocaleString('id-ID')}</p>
+   853→   853→                </div>
+   854→   854→              </div>
+   855→   855→            )}
+   856→   856→            <div className="space-y-2">
+   857→   857→              {payments.all.map(p => {
+   858→   858→                const cfg = PAYMENT_STATUS[p.status] || PAYMENT_STATUS.BELUM_BAYAR;
+   859→   859→                return (
+   860→   860→                  <div key={p.id} className="bg-white rounded-xl p-3 shadow-sm border flex items-center justify-between">
+   861→   861→                    <div>
+   862→   862→                      <p className="text-sm font-medium text-gray-800">{MONTH_NAMES[p.month]} {p.year}</p>
+   863→   863→                      <p className="text-xs text-gray-500">Rp {p.amount.toLocaleString('id-ID')}</p>
+   864→   864→                      {p.paidAt && <p className="text-[10px] text-gray-400">Dibayar: {new Date(p.paidAt).toLocaleDateString('id-ID')}</p>}
+   865→   865→                    </div>
+   866→   866→                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-medium border ${cfg.color}`}>{cfg.label}</span>
+   867→   867→                  </div>
+   868→   868→                );
+   869→   869→              })}
+   870→   870→            </div>
+   871→   871→          </div>
+   872→   872→        )}
+   873→   873→
+   874→   874→        {activeTab === 'announcements' && (
+   875→   875→          <div className="space-y-3">
+   876→   876→            <h3 className="text-lg font-bold text-gray-800">Pengumuman</h3>
+   877→   877→            {announcements.map(a => {
+   878→   878→              const catCfg = CATEGORY_LABELS[a.category] || CATEGORY_LABELS.umum;
+   879→   879→              return (
+   880→   880→                <div key={a.id} className="bg-white rounded-xl p-4 shadow-sm border">
+   881→   881→                  <div className="flex items-center gap-2 mb-2">
+   882→   882→                    {a.isPinned && <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />}
+   883→   883→                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${catCfg.color}`}>{catCfg.label}</span>
+   884→   884→                  </div>
+   885→   885→                  <h4 className="text-sm font-semibold text-gray-800">{a.title}</h4>
+   886→   886→                  <p className="text-xs text-gray-600 mt-1 line-clamp-3">{a.content}</p>
+   887→   887→                  <p className="text-[10px] text-gray-400 mt-2">{a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : ''}</p>
+   888→   888→                </div>
+   889→   889→              );
+   890→   890→            })}
+   891→   891→          </div>
+   892→   892→        )}
+   893→   893→      </main>
+   894→   894→
+   895→   895→      {/* Bottom Navigation */}
+   896→   896→      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
+   897→   897→        <div className="max-w-2xl mx-auto flex">
+   898→   898→          {parentTabs.map(tab => {
+   899→   899→            const Icon = tab.icon;
+   900→   900→            return (
+   901→   901→              <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+   902→   902→                className={`flex-1 py-2 flex flex-col items-center gap-0.5 transition-colors ${
+   903→   903→                  activeTab === tab.key ? 'text-emerald-600' : 'text-gray-400'
+   904→   904→                }`}>
+   905→   905→                <Icon className="w-5 h-5" />
+   906→   906→                <span className="text-[10px] font-medium">{tab.label}</span>
+   907→   907→              </button>
+   908→   908→            );
+   909→   909→          })}
+   910→   910→        </div>
+   911→   911→      </nav>
+   912→   912→
+   913→   913→      {/* Logout Confirm */}
+   914→   914→      {showLogoutConfirm && (
+   915→   915→        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+   916→   916→          <div className="bg-white rounded-2xl p-5 max-w-sm w-full shadow-xl">
+   917→   917→            <h3 className="font-semibold text-gray-800 mb-2">Keluar dari Portal?</h3>
+   918→   918→            <p className="text-sm text-gray-500 mb-4">Anda perlu login kembali untuk mengakses portal.</p>
+   919→   919→            <div className="flex gap-2">
+   920→   920→              <button onClick={() => setShowLogoutConfirm(false)} className="flex-1 py-2 rounded-xl border text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</button>
+   921→   921→              <button onClick={onLogout} className="flex-1 py-2 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700">Keluar</button>
+   922→   922→            </div>
+   923→   923→          </div>
+   924→   924→        </div>
+   925→   925→      )}
+   926→   926→    </div>
+   927→   927→  );
+   928→   928→}
+   929→   929→
+   930→   930→// ============================================================
+   931→   931→// STUDENT PORTAL COMPONENT
+   932→   932→// ============================================================
+   933→   933→function StudentPortal({ dashboard, activeTab, setActiveTab,
+   934→   934→  gradeType, setGradeType, showGradeDropdown, setShowGradeDropdown, isRefreshing,
+   935→   935→  onGradeTypeChange, onLogout, onRefresh, showLogoutConfirm, setShowLogoutConfirm
+   936→   936→}: {
+   937→   937→  dashboard: StudentDashboardData;
+   938→   938→  activeTab: StudentTabKey;
+   939→   939→  setActiveTab: (t: StudentTabKey) => void;
+   940→   940→  gradeType: string;
+   941→   941→  setGradeType: (t: string) => void;
+   942→   942→  showGradeDropdown: boolean;
+   943→   943→  setShowGradeDropdown: (v: boolean) => void;
+   944→   944→  isRefreshing: boolean;
+   945→   945→  onGradeTypeChange: (t: string) => void;
+   946→   946→  onLogout: () => void;
+   947→   947→  onRefresh: () => void;
+   948→   948→  showLogoutConfirm: boolean;
+   949→   949→  setShowLogoutConfirm: (v: boolean) => void;
+   950→   950→}) {
+   951→   951→  const { student, attendanceSummary, grades, schedules, violations, achievements, tahfiz, announcements } = dashboard;
+   952→   952→  const attendancePercent = attendanceSummary.total > 0 ? Math.round((attendanceSummary.hadir / attendanceSummary.total) * 100) : 0;
+   953→   953→
+   954→   954→  // Group schedules by day
+   955→   955→  const scheduleByDay: Record<number, ScheduleInfo[]> = {};
+   956→   956→  for (const s of schedules) {
+   957→   957→    if (!scheduleByDay[s.dayOfWeek]) scheduleByDay[s.dayOfWeek] = [];
+   958→   958→    scheduleByDay[s.dayOfWeek].push(s);
+   959→   959→  }
+   960→   960→
+   961→   961→  // Current day of week (1=Senin ... 6=Sabtu)
+   962→   962→  const today = new Date().getDay();
+   963→   963→  const todayDow = today === 0 ? 0 : today; // Sunday = 0
+   964→   964→
+   965→   965→  const studentTabs: { key: StudentTabKey; label: string; icon: typeof BookOpen }[] = [
+   966→   966→    { key: 'dashboard', label: 'Beranda', icon: BookOpen },
+   967→   967→    { key: 'schedule', label: 'Jadwal', icon: Calendar },
+   968→   968→    { key: 'grades', label: 'Nilai', icon: Star },
+   969→   969→    { key: 'tahfiz', label: 'Tahfiz', icon: Moon },
+   970→   970→    { key: 'kesiswaan', label: 'Siswa', icon: ShieldAlert },
+   971→   971→    { key: 'announcements', label: 'Info', icon: Bell },
+   972→   972→  ];
+   973→   973→
+   974→   974→  return (
+   975→   975→    <div className="min-h-screen bg-gray-50 flex flex-col">
+   976→   976→      <header className="bg-gradient-to-r from-blue-700 to-indigo-700 text-white px-4 py-3 shadow-lg sticky top-0 z-50">
+   977→   977→        <div className="max-w-2xl mx-auto flex items-center justify-between">
+   978→   978→          <div className="flex items-center gap-3">
+   979→   979→            <div className="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center">
+   980→   980→              <GraduationCap className="w-5 h-5" />
+   981→   981→            </div>
+   982→   982→            <div>
+   983→   983→              <h1 className="text-sm font-bold leading-tight">Portal Siswa</h1>
+   984→   984→              <p className="text-[10px] text-blue-100">{student.tenant.name}</p>
+   985→   985→            </div>
+   986→   986→          </div>
+   987→   987→          <div className="flex items-center gap-2">
+   988→   988→            <button onClick={onRefresh} className="p-2 hover:bg-white/10 rounded-lg transition-colors" title="Refresh">
+   989→   989→              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+   990→   990→            </button>
+   991→   991→            <button onClick={() => setShowLogoutConfirm(true)} className="p-2 hover:bg-white/10 rounded-lg transition-colors" title="Keluar">
+   992→   992→              <LogOut className="w-4 h-4" />
+   993→   993→            </button>
+   994→   994→          </div>
+   995→   995→        </div>
+   996→   996→      </header>
+   997→   997→
+   998→   998→      <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-4 pb-24">
+   999→   999→        {/* ============ STUDENT DASHBOARD ============ */}
+  1000→  1000→        {activeTab === 'dashboard' && (
+
+[showing lines 501-1000 of 1496; use offset=1001 with limit to continue reading]
