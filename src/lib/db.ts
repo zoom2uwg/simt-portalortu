@@ -10,4 +10,6 @@ export const db =
     log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
   })
 
+// Always store in globalThis to prevent multiple instances
+// in both development and production Next.js environments
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db

@@ -41,6 +41,10 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
 }
 
 :root {
@@ -116,17 +120,116 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    /* Prevent overscroll bounce on iOS */
+    overscroll-behavior: none;
+    /* Smooth scrolling with reduced motion support */
+    scroll-behavior: smooth;
+    /* Prevent text size adjust on orientation change */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
   body {
     @apply bg-background text-foreground;
+    /* Remove tap highlight on mobile */
     -webkit-tap-highlight-color: transparent;
+    /* Prevent overscroll */
+    overscroll-behavior: none;
+    /* Smooth touch scrolling */
+    -webkit-overflow-scrolling: touch;
+    /* Font smoothing */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevent pull-to-refresh in standalone mode */
+    overscroll-behavior-y: contain;
+    /* Touch action for better mobile scrolling */
+    touch-action: manipulation;
   }
 }
 
 /* ============================================================
-   SIMT MTs - Micro-interaction & Animation System
+   SIMT MTs - Mobile-First Native & PWA System
    ============================================================ */
 
-/* Page/tab transition: slide-up fade */
+/* === Safe Area Support === */
+/* For devices with notch/dynamic island (iPhone X+) */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.safe-area-x {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* === Standalone PWA Mode === */
+/* When app is installed as PWA, add safe area insets */
+@media (display-mode: standalone) {
+  .pwa-header {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .pwa-bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  /* Hide browser chrome elements in standalone */
+  .pwa-hide {
+    display: none;
+  }
+}
+
+/* Also apply for iOS standalone */
+@media all and (display-mode: standalone) {
+  .pwa-header {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .pwa-bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* === Touch Target Sizing === */
+/* Ensure all interactive elements meet 44px minimum touch target */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+.touch-target-sm {
+  min-height: 36px;
+  min-width: 36px;
+}
+
+/* === Momentum Scrolling === */
+.scroll-native {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scroll-behavior: smooth;
+}
+
+/* === Pull-to-Refresh Indicator === */
+.ptr-indicator {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  will-change: transform, opacity;
+}
+.ptr-indicator.ptr-pulling {
+  transform: translateY(0) rotate(0deg);
+  opacity: 1;
+}
+.ptr-indicator.ptr-ready {
+  transform: translateY(0) rotate(180deg);
+  opacity: 1;
+}
+.ptr-indicator.ptr-refreshing {
+  animation: ptrSpin 0.8s linear infinite;
+}
+
+@keyframes ptrSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* === Page/tab transition: slide-up fade === */
 @keyframes slideUpFade {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -145,6 +248,10 @@
 }
 @keyframes slideInRight {
   from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 @keyframes shimmer {
@@ -170,16 +277,41 @@
   from { opacity: 1; transform: translateY(0) scale(1); }
   to   { opacity: 0; transform: translateY(-20px) scale(0.95); }
 }
+@keyframes ripple {
+  from { transform: scale(0); opacity: 0.5; }
+  to { transform: scale(2.5); opacity: 0; }
+}
+@keyframes bottomSheetIn {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes bottomSheetOut {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
+}
+@keyframes navPop {
+  0% { transform: scale(0.8); opacity: 0; }
+  70% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
 
 .animate-slide-up   { animation: slideUpFade 0.3s ease-out both; }
 .animate-slide-down  { animation: slideDownFade 0.25s ease-out both; }
 .animate-fade-in     { animation: fadeIn 0.25s ease-out both; }
 .animate-scale-in    { animation: scaleIn 0.25s ease-out both; }
 .animate-slide-right { animation: slideInRight 0.3s ease-out both; }
+.animate-slide-left  { animation: slideInLeft 0.3s ease-out both; }
 .animate-donut       { animation: donutDraw 0.8s ease-out both; }
 .animate-count       { animation: countUp 0.4s ease-out both; }
 .animate-toast-in    { animation: toastIn 0.3s ease-out both; }
 .animate-toast-out   { animation: toastOut 0.25s ease-in both; }
+.animate-nav-pop     { animation: navPop 0.3s ease-out both; }
+.animate-bottom-sheet-in { animation: bottomSheetIn 0.35s cubic-bezier(0.32, 0.72, 0, 1) both; }
+.animate-bottom-sheet-out { animation: bottomSheetOut 0.25s cubic-bezier(0.32, 0.72, 0, 1) both; }
 
 /* Staggered children */
 .stagger-1 { animation-delay: 0.05s; }
@@ -188,17 +320,42 @@
 .stagger-4 { animation-delay: 0.2s; }
 .stagger-5 { animation-delay: 0.25s; }
 .stagger-6 { animation-delay: 0.3s; }
+.stagger-7 { animation-delay: 0.35s; }
+.stagger-8 { animation-delay: 0.4s; }
 
-/* Active press effect for touch */
+/* === Active Press Effect (Native Haptic-style) === */
 .press-effect {
   transition: transform 0.1s ease, opacity 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 .press-effect:active {
-  transform: scale(0.97);
-  opacity: 0.9;
+  transform: scale(0.96);
+  opacity: 0.85;
 }
 
-/* Bottom nav active indicator */
+/* Ripple effect for native-style touch feedback */
+.ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+.ripple-container::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  padding-bottom: 100%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.06);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+.ripple-container:active::after {
+  animation: ripple 0.4s ease-out;
+}
+
+/* === Bottom Navigation === */
 .nav-indicator {
   position: relative;
 }
@@ -212,13 +369,21 @@
   height: 3px;
   border-radius: 2px;
   background: currentColor;
-  transition: transform 0.25s ease;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .nav-indicator.active::after {
   transform: translateX(-50%) scaleX(1);
 }
 
-/* Card hover lift */
+/* Native-style bottom nav with spring animation */
+.nav-item-spring {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
+}
+.nav-item-spring:active {
+  transform: scale(0.85);
+}
+
+/* === Card hover lift === */
 .card-lift {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -231,27 +396,139 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-/* Skeleton shimmer loading */
+/* === Skeleton Shimmer Loading === */
 .skeleton-shimmer {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
 }
+.skeleton-pulse {
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
 
-/* Modal overlay */
+/* === Modal / Bottom Sheet === */
 .modal-overlay {
   animation: fadeIn 0.2s ease-out both;
 }
 .modal-content {
   animation: scaleIn 0.25s ease-out both;
 }
+.bottom-sheet-overlay {
+  animation: fadeIn 0.2s ease-out both;
+}
+.bottom-sheet-content {
+  animation: bottomSheetIn 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
+  border-radius: 16px 16px 0 0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
 
-/* Grade progress bar animation */
+/* === Grade Progress Bar Animation === */
 .progress-fill {
   transition: width 0.6s ease-out;
 }
 
-/* Tab content transition */
+/* === Tab Content Transition === */
 .tab-content {
   animation: slideUpFade 0.25s ease-out both;
+}
+
+/* === Native-Style Input Focus === */
+.native-input {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.15s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.native-input:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  background-color: #f0fdf4;
+}
+.native-input-blue:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  background-color: #eff6ff;
+}
+
+/* === Swipeable Container === */
+.swipe-container {
+  touch-action: pan-y;
+  will-change: transform;
+}
+
+/* === Native-style Switcher === */
+.switch-track {
+  transition: background-color 0.25s ease;
+}
+.switch-thumb {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.25s ease;
+}
+
+/* === Status Bar Color Transition === */
+.status-bar-emerald {
+  background: linear-gradient(to bottom, #047857, #065f46);
+}
+.status-bar-blue {
+  background: linear-gradient(to bottom, #1d4ed8, #1e40af);
+}
+
+/* === Mobile Keyboard Handling === */
+@media (max-height: 500px) {
+  .mobile-keyboard-active .pwa-bottom-nav {
+    display: none;
+  }
+}
+
+/* === Print Hidden in PWA === */
+@media print {
+  .pwa-bottom-nav,
+  .pwa-header {
+    display: none;
+  }
+}
+
+/* === Reduced Motion === */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* === iPhone X+ Home Indicator Padding === */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .home-indicator-pad {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* === Smooth Scroll for Tab Content === */
+.smooth-scroll {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* === Native Action Sheet Style === */
+.action-sheet {
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.15);
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+.action-sheet-item {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  transition: background-color 0.15s ease;
+}
+.action-sheet-item:active {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* === Selection Style === */
+::selection {
+  background: rgba(16, 185, 129, 0.2);
+  color: inherit;
 }

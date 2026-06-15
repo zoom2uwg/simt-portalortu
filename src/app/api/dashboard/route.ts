@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+const MONTH_NAMES = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -29,7 +32,6 @@ export async function GET(request: Request) {
     }
 
     // === ATTENDANCE ===
-    // Current month data first, fallback to most recent month
     const now = new Date();
     const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -38,28 +40,23 @@ export async function GET(request: Request) {
       orderBy: { date: 'desc' },
     });
 
-    // Determine period label
     let attendancePeriodLabel: string;
     let allPeriodAttendances = currentMonthAttendances;
 
     if (currentMonthAttendances.length > 0) {
-      const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-      attendancePeriodLabel = `Bulan ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+      attendancePeriodLabel = `Bulan ${MONTH_NAMES[now.getMonth()]} ${now.getFullYear()}`;
     } else {
-      // Fallback: find most recent month with data
       const lastRecord = await db.attendance.findFirst({
         where: { studentId },
         orderBy: { date: 'desc' },
       });
       if (lastRecord) {
         const lastDate = new Date(lastRecord.date);
-        const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-          'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-        attendancePeriodLabel = `Bulan ${monthNames[lastDate.getMonth()]} ${lastDate.getFullYear()}`;
+        attendancePeriodLabel = `Bulan ${MONTH_NAMES[lastDate.getMonth()]} ${lastDate.getFullYear()}`;
         const startOfLastMonth = new Date(lastDate.getFullYear(), lastDate.getMonth(), 1);
+        const startOfNextMonth = new Date(lastDate.getFullYear(), lastDate.getMonth() + 1, 1);
         allPeriodAttendances = await db.attendance.findMany({
-          where: { studentId, date: { gte: startOfLastMonth } },
+          where: { studentId, date: { gte: startOfLastMonth, lt: startOfNextMonth } },
           orderBy: { date: 'desc' },
         });
       } else {
@@ -67,73 +64,81 @@ export async function GET(request: Request) {
       }
     }
 
+    // Single-pass attendance summary
+    let hadir = 0, sakit = 0, izin = 0, alpha = 0;
+    const daily = allPeriodAttendances.map(a => {
+      if (a.status === 'HADIR') hadir++;
+      else if (a.status === 'SAKIT') sakit++;
+      else if (a.status === 'IZIN') izin++;
+      else if (a.status === 'ALPHA') alpha++;
+      return {
+        date: a.date instanceof Date ? a.date.toISOString() : String(a.date),
+        status: a.status,
+        timeIn: a.timeIn ? (a.timeIn instanceof Date ? a.timeIn.toISOString() : String(a.timeIn)) : null,
+        timeOut: a.timeOut ? (a.timeOut instanceof Date ? a.timeOut.toISOString() : String(a.timeOut)) : null,
+        note: a.note,
+      };
+    });
+
     const attendanceSummary = {
-      hadir: allPeriodAttendances.filter(a => a.status === 'HADIR').length,
-      sakit: allPeriodAttendances.filter(a => a.status === 'SAKIT').length,
-      izin: allPeriodAttendances.filter(a => a.status === 'IZIN').length,
-      alpha: allPeriodAttendances.filter(a => a.status === 'ALPHA').length,
+      hadir, sakit, izin, alpha,
       total: allPeriodAttendances.length,
       recent: allPeriodAttendances.slice(0, 10),
+      daily,
       periodLabel: attendancePeriodLabel,
       hasData: allPeriodAttendances.length > 0,
     };
 
-    // === GRADES ===
-    // Fetch the requested grade type
+    // === PARALLEL QUERIES ===
     const validGradeTypes = ['PENGETAHUAN', 'KETERAMPILAN', 'UTS', 'UAS', 'SIKAP'] as const;
     const safeGradeType = validGradeTypes.includes(gradeType as typeof validGradeTypes[number])
       ? gradeType : 'PENGETAHUAN';
 
-    const grades = await db.grade.findMany({
-      where: { studentId, type: safeGradeType },
-      include: { subject: { select: { name: true, code: true } } },
-      orderBy: { subject: { name: 'asc' } },
-    });
+    const [grades, gradeTypeCounts, payments, announcements] = await Promise.all([
+      db.grade.findMany({
+        where: { studentId, type: safeGradeType },
+        include: { subject: { select: { id: true, name: true, code: true } } },
+        orderBy: { subject: { name: 'asc' } },
+      }),
+      db.grade.groupBy({
+        by: ['type'],
+        where: { studentId },
+        _count: true,
+      }),
+      db.payment.findMany({
+        where: { studentId, type: 'SPP' },
+        orderBy: [{ year: 'desc' }, { month: 'desc' }],
+        take: 12,
+      }),
+      db.announcement.findMany({
+        where: {
+          tenantId: student.tenantId,
+          publishedAt: { lte: now },
+          OR: [{ expiresAt: null }, { expiresAt: { gte: now } }],
+        },
+        orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }],
+        take: 10,
+      }),
+    ]);
+
+    const availableGradeTypes = gradeTypeCounts
+      .filter(g => g._count > 0)
+      .map(g => ({ type: g.type, count: g._count }));
 
     const avgGrade = grades.length > 0
       ? grades.reduce((sum, g) => sum + g.score, 0) / grades.length
       : 0;
 
-    // Count available grade types
-    const gradeTypeCounts = await db.grade.groupBy({
-      by: ['type'],
-      where: { studentId },
-      _count: true,
-    });
-    const availableGradeTypes = gradeTypeCounts
-      .filter(g => g._count > 0)
-      .map(g => ({ type: g.type, count: g._count }));
-
-    // === PAYMENTS ===
-    const payments = await db.payment.findMany({
-      where: { studentId, type: 'SPP' },
-      orderBy: [{ year: 'desc' }, { month: 'desc' }],
-    });
-
     const unpaidPayments = payments.filter(p => p.status === 'BELUM_BAYAR');
     const totalUnpaid = unpaidPayments.reduce((sum, p) => sum + p.amount, 0);
     const totalPaid = payments.filter(p => p.status === 'LUNAS').reduce((sum, p) => sum + p.amount, 0);
 
-    // === ANNOUNCEMENTS ===
-    const announcements = await db.announcement.findMany({
-      where: {
-        tenantId: student.tenantId,
-        publishedAt: { lte: now },
-        OR: [
-          { expiresAt: null },
-          { expiresAt: { gte: now } },
-        ],
-      },
-      orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }],
-      take: 10,
-    });
-
-    // Always get PENGETAHUAN average for Quick Stats consistency
+    // Only fetch pengetahuan if different type is active
     const pengetahuanGrades = safeGradeType === 'PENGETAHUAN'
       ? grades
       : await db.grade.findMany({
           where: { studentId, type: 'PENGETAHUAN' },
-          include: { subject: { select: { name: true, code: true } } },
+          include: { subject: { select: { id: true, name: true, code: true } } },
           orderBy: { subject: { name: 'asc' } },
         });
     const pengetahuanAvg = pengetahuanGrades.length > 0
@@ -175,7 +180,7 @@ export async function GET(request: Request) {
         isAllTuntas: belowKKMCount === 0 && pengetahuanGrades.length > 0,
       },
       payments: {
-        all: payments.slice(0, 12),
+        all: payments,
         unpaid: unpaidPayments,
         totalUnpaid,
         totalPaid,
