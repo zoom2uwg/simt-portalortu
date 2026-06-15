@@ -285,6 +285,99 @@ async function main() {
   const grades = await Promise.all(gradeData);
   console.log(`✅ Grades: ${grades.length} records`);
 
+  // 9b. Grade Details for ALL students - detailed sub-grades per subject
+  const gradeDetailData = [];
+  const tugasTitles = ['Tugas 1', 'Tugas 2', 'Tugas 3', 'Tugas 4'];
+  const harianTitles = ['Ulangan Harian 1', 'Ulangan Harian 2', 'Ulangan Harian 3'];
+  for (const student of students) {
+    const classSubjects = allSubjects.filter(s => s.classroomId === student.classroomId);
+    for (const subject of classSubjects) {
+      // Tugas (assignments) - 3-4 items
+      const numTugas = 3 + Math.floor(Math.random() * 2);
+      for (let t = 0; t < numTugas; t++) {
+        gradeDetailData.push(
+          prisma.gradeDetail.create({
+            data: {
+              tenantId: tenant.id, studentId: student.id, subjectId: subject.id,
+              category: 'TUGAS',
+              title: tugasTitles[t] || `Tugas ${t + 1}`,
+              score: 60 + Math.floor(Math.random() * 35),
+              weight: 1,
+              date: new Date(2026, 1 + Math.floor(Math.random() * 4), 1 + Math.floor(Math.random() * 25)),
+              note: Math.random() > 0.7 ? 'Dikumpulkan tepat waktu' : null,
+            },
+          })
+        );
+      }
+      // Ulangan Harian (daily quizzes) - 2-3 items
+      const numHarian = 2 + Math.floor(Math.random() * 2);
+      for (let h = 0; h < numHarian; h++) {
+        gradeDetailData.push(
+          prisma.gradeDetail.create({
+            data: {
+              tenantId: tenant.id, studentId: student.id, subjectId: subject.id,
+              category: 'HARIAN',
+              title: harianTitles[h] || `Ulangan Harian ${h + 1}`,
+              score: 55 + Math.floor(Math.random() * 40),
+              weight: 2,
+              date: new Date(2026, 1 + Math.floor(Math.random() * 4), 1 + Math.floor(Math.random() * 25)),
+              note: null,
+            },
+          })
+        );
+      }
+      // UTS
+      gradeDetailData.push(
+        prisma.gradeDetail.create({
+          data: {
+            tenantId: tenant.id, studentId: student.id, subjectId: subject.id,
+            category: 'UTS',
+            title: 'UTS Semester Genap',
+            score: 60 + Math.floor(Math.random() * 35),
+            weight: 3,
+            date: new Date(2026, 2, 16 + Math.floor(Math.random() * 3)),
+            note: null,
+          },
+        })
+      );
+      // UAS
+      gradeDetailData.push(
+        prisma.gradeDetail.create({
+          data: {
+            tenantId: tenant.id, studentId: student.id, subjectId: subject.id,
+            category: 'UAS',
+            title: 'UAS Semester Genap',
+            score: 62 + Math.floor(Math.random() * 33),
+            weight: 3,
+            date: new Date(2026, 5, 8 + Math.floor(Math.random() * 3)),
+            note: null,
+          },
+        })
+      );
+      // Nilai Akhir (composite)
+      const tugasAvg = 60 + Math.floor(Math.random() * 35);
+      const harianAvg = 55 + Math.floor(Math.random() * 40);
+      const utsScore = 60 + Math.floor(Math.random() * 35);
+      const uasScore = 62 + Math.floor(Math.random() * 33);
+      const nilaiAkhir = Math.round(tugasAvg * 0.25 + harianAvg * 0.25 + utsScore * 0.25 + uasScore * 0.25);
+      gradeDetailData.push(
+        prisma.gradeDetail.create({
+          data: {
+            tenantId: tenant.id, studentId: student.id, subjectId: subject.id,
+            category: 'AKHIR',
+            title: 'Nilai Akhir',
+            score: nilaiAkhir,
+            weight: 0,
+            date: new Date(2026, 5, 20),
+            note: `Tugas 25% + Harian 25% + UTS 25% + UAS 25%`,
+          },
+        })
+      );
+    }
+  }
+  const gradeDetails = await Promise.all(gradeDetailData);
+  console.log(`✅ Grade Details: ${gradeDetails.length} records`);
+
   // 10. Payments (SPP Jan-Jun 2026) for ALL students
   const paymentData = [];
   const months = [1, 2, 3, 4, 5, 6];

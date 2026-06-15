@@ -45,6 +45,7 @@ model Tenant {
   payments        Payment[]
   announcements   Announcement[]
   grades          Grade[]
+  gradeDetails    GradeDetail[]
   whatsappConfigs WhatsappConfig[]
   schedules       Schedule[]
   violations      StudentViolation[]
@@ -159,6 +160,7 @@ model Subject {
   classroom       Classroom @relation(fields: [classroomId], references: [id])
   teacher         User?     @relation("SubjectTeacher", fields: [teacherId], references: [id])
   grades          Grade[]
+  gradeDetails    GradeDetail[]
   schedules        Schedule[]
 
   createdAt DateTime @default(now())
@@ -219,6 +221,7 @@ model Student {
   classroom       Classroom?   @relation(fields: [classroomId], references: [id])
   attendances     Attendance[]
   grades          Grade[]
+  gradeDetails    GradeDetail[]
   payments        Payment[]
   violations      StudentViolation[]
   achievements    StudentAchievement[]
@@ -309,6 +312,38 @@ enum GradeType {
   RAPOR         // Nilai Rapor
 
   @@map("grade_types")
+}
+
+model GradeDetail {
+  id          String              @id @default(cuid())
+  tenantId    String
+  studentId   String
+  subjectId   String
+  category    GradeDetailCategory @default(TUGAS)
+  title       String              // "Tugas 1", "Kuis 2", "UAS Semester Genap", dll.
+  score       Float               @default(0)
+  weight      Float               @default(1)   // Bobot/berat penilaian
+  date        DateTime?           // Tanggal penilaian
+  note        String?             // Keterangan
+
+  tenant      Tenant              @relation(fields: [tenantId], references: [id])
+  student     Student             @relation(fields: [studentId], references: [id])
+  subject     Subject             @relation(fields: [subjectId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("grade_details")
+}
+
+enum GradeDetailCategory {
+  TUGAS     // Tugas / PR
+  HARIAN    // Ulangan Harian
+  UTS       // Ujian Tengah Semester
+  UAS       // Ujian Akhir Semester
+  AKHIR     // Nilai Akhir (komposit)
+
+  @@map("grade_detail_categories")
 }
 
 // =====================================================
