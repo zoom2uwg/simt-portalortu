@@ -1,9 +1,9 @@
 module.exports = {
   apps: [{
-    name: 'simt-mts',
-    script: 'node_modules/.bin/next',
+    name: 'simt-portalortu',
+    script: 'node_modules/next/dist/bin/next',
     args: 'start -p 3000',
-    cwd: '/home/z/my-project',
+    cwd: __dirname,
     env: {
       NODE_ENV: 'production',
       NODE_OPTIONS: '--max-old-space-size=1024',

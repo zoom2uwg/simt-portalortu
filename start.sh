@@ -1,11 +1,11 @@
 #!/bin/bash
-# SIMT MTs Server Start Script with Auto-Restart
-cd /home/z/my-project
+# SIMT Portal Ortu Server Start Script with Auto-Restart
+cd "$(dirname "$0")"
 
 # Ensure Prisma Client is generated
 npx prisma generate --no-hint 2>/dev/null
 
-echo "Starting SIMT MTs server with auto-restart..."
+echo "Starting SIMT Portal Ortu server with auto-restart..."
 RESTART_COUNT=0
 MAX_RESTARTS=10
 
