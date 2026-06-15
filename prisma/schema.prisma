@@ -2,6 +2,10 @@
 // SIMT MTs - Sistem Informasi Manajemen Terpadu
 // Madrasah Tsanawiyah / SMP Yayasan
 // Multi-Tenant Database Schema
+//
+// DATABASE PROVIDER OPTIONS (set in .env):
+//   PostgreSQL (NeonDB/Supabase): provider  = "sqlite"
+//   MySQL (Aiven):                provider  = "sqlite"
 // =====================================================
 
 generator client {
@@ -9,8 +13,14 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  // Ganti sesuai provider di .env:
+  //   "postgresql" → NeonDB / Supabase
+  //   "mysql"      → Aiven MySQL
+  provider  = "sqlite"
+  url       = env("DATABASE_URL")
+  // directUrl dipakai untuk NeonDB + connection pooling (pgbouncer)
+  // Untuk MySQL/Supabase non-pooled, bisa dikosongkan atau sama dengan DATABASE_URL
+  directUrl = env("DATABASE_DIRECT_URL")
 }
 
 // =====================================================
