@@ -6,7 +6,6 @@
     "dev": "next dev -p 3000",
     "build": "node prisma/prepare.js && next build",
     "build:standalone": "node prisma/prepare.js && next build && xcopy /E /I /Y .next\\static .next\\standalone\\.next\\static && xcopy /E /I /Y public .next\\standalone\\public",
-    "build:production": "node prisma/prepare.js && prisma generate && next build",
     "postinstall": "node prisma/prepare.js && prisma generate",
     "start": "next start",
     "start:standalone": "set NODE_ENV=production && bun .next/standalone/server.js",
