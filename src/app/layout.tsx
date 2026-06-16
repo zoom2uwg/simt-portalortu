@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   description: "Sistem Informasi Manajemen Terpadu Madrasah Tsanawiyah - Portal Orang Tua dan Siswa",
   keywords: ["SIMT", "MTs", "Madrasah", "Portal", "Orang Tua", "Siswa", "Pendidikan"],
   authors: [{ name: "SIMT MTs" }],
-  manifest: "/manifest.json",
+  manifest: "/manifest.webmanifest",
   icons: {
     icon: [
       { url: "/icon-32x32.png", sizes: "32x32", type: "image/png" },
@@ -87,18 +87,7 @@ export default function RootLayout({
       >
         {children}
         <Toaster />
-        {/* Service Worker Registration */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js').catch(function() {});
-                });
-              }
-            `,
-          }}
-        />
+        {/* Service Worker diregistrasi otomatis oleh Serwist (@serwist/next) */}
       </body>
     </html>
   );
