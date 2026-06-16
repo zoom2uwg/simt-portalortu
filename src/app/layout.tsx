@@ -52,15 +52,8 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SIMT MTs Portal",
     description: "Portal Orang Tua & Siswa - Sistem Informasi Manajemen Terpadu MTs",
-    url: "https://chat.z.ai",
-    siteName: "Z.ai",
     type: "website",
     locale: "id_ID",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
   },
   formatDetection: {
     telephone: false,
