@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { hydrateStudentCache } from '@/lib/cache-hydrator';
 import {
   GraduationCap, LogIn, BookOpen, ClipboardCheck, CreditCard,
   Bell, User, AlertCircle, CheckCircle2,
@@ -605,8 +606,11 @@ export default function SIMTPortal() {
       if (!res.ok) { setLoginError(data.error || 'Login gagal'); return; }
       setParentStudents(data.students);
       if (data.students.length > 0) {
-        setSelectedStudentId(data.students[0].id);
+        const firstStudentId = data.students[0].id;
+        setSelectedStudentId(firstStudentId);
         setIsLoggedIn(true);
+        // Pre-warm cache di background untuk akses offline
+        hydrateStudentCache({ studentId: firstStudentId, role: 'parent' }).catch(() => {});
       }
     } catch { setLoginError('Tidak dapat terhubung ke server. Periksa koneksi internet Anda.'); }
     finally { setIsLoading(false); }
@@ -624,8 +628,11 @@ export default function SIMTPortal() {
       });
       const data = await res.json();
       if (!res.ok) { setLoginError(data.error || 'Login gagal'); return; }
-      setSelectedStudentId(data.student.id);
+      const studentId = data.student.id;
+      setSelectedStudentId(studentId);
       setIsLoggedIn(true);
+      // Pre-warm cache di background untuk akses offline
+      hydrateStudentCache({ studentId, role: 'student' }).catch(() => {});
     } catch { setLoginError('Tidak dapat terhubung ke server. Periksa koneksi internet Anda.'); }
     finally { setIsLoading(false); }
   }, [nis, studentPassword]);
