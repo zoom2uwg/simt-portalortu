@@ -816,7 +816,7 @@ export default function SIMTPortal() {
                       <input type="email" value={email}
                         onChange={(e) => { setEmail(e.target.value); setLoginError(''); }}
                         onKeyDown={(e) => e.key === 'Enter' && handleParentLogin()}
-                        placeholder="ortu1@email.com"
+                        placeholder="wali_0001@simt.local"
                         className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl native-input text-base outline-none"
                         autoComplete="email" inputMode="email" />
                     </div>
@@ -831,7 +831,7 @@ export default function SIMTPortal() {
                     {isLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><LogIn className="w-4 h-4" />Masuk</>}
                   </button>
                   <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl">
-                    <p className="text-xs text-amber-700"><strong>Demo:</strong> Email <code className="bg-amber-100 px-1 py-0.5 rounded">ortu1@email.com</code> s/d <code className="bg-amber-100 px-1 py-0.5 rounded">ortu8@email.com</code></p>
+                    <p className="text-xs text-amber-700"><strong>Demo:</strong> Email <code className="bg-amber-100 px-1 py-0.5 rounded">wali_0001@simt.local</code> s/d <code className="bg-amber-100 px-1 py-0.5 rounded">wali_0010@simt.local</code></p>
                   </div>
                 </div>
               ) : (
@@ -843,7 +843,7 @@ export default function SIMTPortal() {
                       <input type="text" value={nis}
                         onChange={(e) => { setNis(e.target.value); setLoginError(''); }}
                         onKeyDown={(e) => e.key === 'Enter' && handleStudentLogin()}
-                        placeholder="20250001"
+                        placeholder="0001"
                         className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl native-input-blue text-base outline-none"
                         inputMode="numeric" autoComplete="username" />
                     </div>
@@ -874,7 +874,7 @@ export default function SIMTPortal() {
                     {isLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><LogIn className="w-4 h-4" />Masuk</>}
                   </button>
                   <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl">
-                    <p className="text-xs text-blue-700"><strong>Demo:</strong> NIS <code className="bg-blue-100 px-1 py-0.5 rounded">20250001</code> s/d <code className="bg-blue-100 px-1 py-0.5 rounded">20250010</code>, Password: <code className="bg-blue-100 px-1 py-0.5 rounded">siswa123</code></p>
+                    <p className="text-xs text-blue-700"><strong>Demo:</strong> NIS <code className="bg-blue-100 px-1 py-0.5 rounded">0001</code> s/d <code className="bg-blue-100 px-1 py-0.5 rounded">0010</code>, Password: <code className="bg-blue-100 px-1 py-0.5 rounded">siswa123</code></p>
                   </div>
                 </div>
               )}
