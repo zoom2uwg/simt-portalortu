@@ -1,0 +1,15 @@
+[build]
+# Build command — runs prisma prepare (auto-detect provider), prisma generate, then next build
+builder = "NIXPACKS"
+buildCommand = "npm run build:production"
+
+[deploy]
+# Start the standalone Next.js server
+startCommand = "node .next/standalone/server.js"
+healthcheckPath = "/api"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[environments.production.deploy]
+numReplicas = 1

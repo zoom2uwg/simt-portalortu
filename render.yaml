@@ -1,0 +1,85 @@
+services:
+  # ─────────────────────────────────────────────
+  # Next.js Web Service
+  # ─────────────────────────────────────────────
+  - type: web
+    name: simt-portalortu
+    runtime: node
+    plan: free          # ganti ke "starter" atau "standard" untuk production
+    region: singapore   # paling dekat Indonesia; opsi: singapore, ohio, oregon, frankfurt
+    buildCommand: npm run build:production
+    startCommand: node .next/standalone/server.js
+    healthCheckPath: /api
+    autoDeploy: true    # auto deploy saat push ke branch utama
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: PORT
+        value: 3000
+
+      # ── Database ──────────────────────────────
+      # Opsi A: Pakai Neon (PostgreSQL serverless) — direkomendasikan untuk PWA
+      #   Set DATABASE_PROVIDER=postgresql
+      #   Set DATABASE_URL=<neon pooled url>
+      #   Set DATABASE_DIRECT_URL=<neon direct url>
+      #
+      # Opsi B: Pakai Render PostgreSQL (lihat bagian databases di bawah)
+      #   Set DATABASE_PROVIDER=postgresql
+      #   Set DATABASE_URL dari fromDatabase reference
+      #   DATABASE_DIRECT_URL=<sama dengan DATABASE_URL>
+      #
+      # Opsi C: PlanetScale (MySQL serverless)
+      #   Set DATABASE_PROVIDER=mysql
+      #   Set DATABASE_URL=<planetscale url>
+      - key: DATABASE_PROVIDER
+        value: postgresql   # ganti ke "mysql" jika pakai PlanetScale
+
+      - key: DATABASE_URL
+        sync: false         # isi manual di dashboard Render
+
+      - key: DATABASE_DIRECT_URL
+        sync: false         # isi manual di dashboard Render (sama dengan DATABASE_URL jika tidak pakai pooler)
+
+      # ── Storage ───────────────────────────────
+      - key: STORAGE_PROVIDER
+        value: imagekit     # atau "cloudinary"
+
+      - key: IMAGEKIT_PUBLIC_KEY
+        sync: false
+
+      - key: IMAGEKIT_PRIVATE_KEY
+        sync: false
+
+      - key: IMAGEKIT_URL_ENDPOINT
+        sync: false
+
+      # Cloudinary (isi jika STORAGE_PROVIDER=cloudinary)
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+
+      - key: CLOUDINARY_API_KEY
+        sync: false
+
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+
+      # ── WhatsApp Gateway ──────────────────────
+      - key: WA_SERVICE_URL
+        sync: false         # URL Railway/VPS WA Gateway service
+
+      - key: WA_SERVICE_SECRET
+        sync: false
+
+# ─────────────────────────────────────────────
+# Render PostgreSQL (opsional — uncomment jika ingin DB di Render sendiri)
+# Catatan: Free tier Render PostgreSQL expires setelah 90 hari.
+# Untuk produksi, lebih baik pakai Neon (free forever dengan 0.5GB storage).
+# ─────────────────────────────────────────────
+# databases:
+#   - name: simt-db
+#     plan: free
+#     region: singapore
+#     databaseName: simt_portalortu
+#     user: simt_user

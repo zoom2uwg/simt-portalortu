@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Disable standalone output on Vercel or Netlify deployments
+  // Use standalone output only on self-hosted platforms (Railway, Render, VPS)
+  // Vercel and Netlify handle bundling themselves
   output: (process.env.VERCEL || process.env.NETLIFY) ? undefined : "standalone",
   /* config options here */
   typescript: {
