@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { OfflineBanner } from "@/components/offline-banner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
   description: "Sistem Informasi Manajemen Terpadu Madrasah Tsanawiyah - Portal Orang Tua dan Siswa",
   keywords: ["SIMT", "MTs", "Madrasah", "Portal", "Orang Tua", "Siswa", "Pendidikan"],
   authors: [{ name: "SIMT MTs" }],
-  manifest: "/manifest.json",
+  manifest: "/manifest.webmanifest",
   icons: {
     icon: [
       { url: "/icon-32x32.png", sizes: "32x32", type: "image/png" },
@@ -85,20 +86,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground overscroll-none`}
       >
+        <OfflineBanner />
         {children}
         <Toaster />
-        {/* Service Worker Registration */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js').catch(function() {});
-                });
-              }
-            `,
-          }}
-        />
+        {/* Service Worker diregistrasi otomatis oleh Serwist (@serwist/next) */}
       </body>
     </html>
   );
